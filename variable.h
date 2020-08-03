@@ -1,4 +1,5 @@
 #pragma once
+#include"bool.h"
 
 typedef struct Variable{
 	char * name;
@@ -8,8 +9,8 @@ typedef struct Variable{
 
 Variable * createTable();
 
-void insertVariable(char *, int, Variable**);
+bool insertVariable(char *, int, Variable**);
 
-int valueOf(char *, const Variable*);
+bool valueOf(char *, int*, const Variable*);
 
 void printTable(const Variable *);

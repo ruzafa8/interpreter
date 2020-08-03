@@ -7,20 +7,30 @@ Variable * createTable(){
 	return NULL;
 }
 
-void insertVariable(char * name, int value, Variable** table){
-	Variable * new = (Variable*) malloc(sizeof(Variable));
-	new->name = strdup(name);
-	new->value = value;
-	new->next = *table;
-	*table = new;
+bool exists(char * name, Variable* table){
+	bool exists = false;
+	while(table != NULL && !(exists = strcmp(table->name,name) == 0));
+	return exists;
 }
 
-int valueOf(char * name, const Variable* table){
+bool insertVariable(char * name, int value, Variable** table){
+	bool notExists = !exists(name, *table);
+	if(notExists){
+		Variable * new = (Variable*) malloc(sizeof(Variable));
+		new->name = strdup(name);
+		new->value = value;
+		new->next = *table;
+		*table = new;
+	}
+	return notExists;
+}
+
+bool valueOf(char * name, int* value, const Variable* table){
 	while(table != NULL && strcmp(table->name, name) != 0)
 		table = table->next;
 	if(table != NULL) 
-		return table->value;
-	return 0;
+		*value = table->value;
+	return table != NULL;
 }
 
 void printTable(const Variable *t){

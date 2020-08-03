@@ -29,7 +29,9 @@ S: expr ENTER{printf("> %d\n",evaluate($1)); return 0;}
  | statements ENTER{return 0;}
  ;
 statements: statement statements | statement;
-statement: VAR_NAME TWO_POINTS EQUALS expr {insertVariable($1,evaluate($4),&table);}
+statement: VAR_NAME TWO_POINTS EQUALS expr {	bool inserted = insertVariable($1,evaluate($4),&table);
+												if(!inserted) printf("La variable %s no se ha insertado porque ya existía",$1);
+										   }
          ;
 expr: expr PLUS expr0  {$$ = createBinary(PLUS_OP,$1, $3);}
     | expr MINUS expr0 {$$ = createBinary(MINUS_BINARY_OP,$1, $3);}
@@ -47,7 +49,12 @@ expr1: MINUS expr1 {$$ = createUnary(MINUS_UNARY_OP, $2);}
 
 expr2: OPEN_PAR expr CLOSE_PAR {$$ = $2;}
      | NUMBER {$$ = createLeaf($1);}	
-     | VAR_NAME {$$ = createLeaf(valueOf($1,table));}
+     | VAR_NAME {
+					int value;
+					bool obtenido = valueOf($1,&value,table);
+					if(!obtenido) {printf("La variable no existía"); return -1;}
+					else $$ = createLeaf(value);
+}
      ;
 %%
 
