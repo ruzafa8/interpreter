@@ -5,7 +5,11 @@
 DIGIT  [[:digit:]]
 DIGITS {DIGIT}+
 
+LITERAL [[:alpha:]]
+LITERALS {LITERAL}+
+
 %%
+
 {DIGITS}  {yylval.integer = atoi(yytext); return NUMBER;}
 "("       return OPEN_PAR;
 ")"       return CLOSE_PAR;
@@ -13,8 +17,13 @@ DIGITS {DIGIT}+
 "-"       return MINUS;
 "*"       return BY;
 "/"       return DIV;
-\n        return ENTER;
+"\n"	  return ENTER;
+":"       return TWO_POINTS;
+"="       return EQUALS;
+
+
+{LITERALS} {yylval.string = strdup(yytext); return VAR_NAME;}
+
 .         //Do nothing
 
 %%
-
