@@ -20,6 +20,7 @@ LITERALS {LITERAL}+
 "\n"	  return ENTER;
 ":"       return TWO_POINTS;
 "="       return EQUALS;
+"print"   return PRINT;
 
 
 {LITERALS} {yylval.string = strdup(yytext); return VAR_NAME;}
