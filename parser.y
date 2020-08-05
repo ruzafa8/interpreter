@@ -26,13 +26,14 @@
 %start S
 %%
 
-S: statements FIN{execute($1,&table); return 0;}
+S: statements FIN{printf("AAAAAAAAAAAAA\n");execute($1,&table); printf("HOLA?"); return 0;}
  ;
-statements: statement {$$ = $1;}
-          | statement statements {$$ = createDoubleSt($1,$2);}
+statements: statement {printf("LAST ST\n");$$ = $1;}
+          | statement statements {printf("DOS ST\n");$$ = createDoubleSt($1,$2);}
           ;
-statement: VAR_NAME TWO_POINTS EQUALS expr {$$ = createDeclAsigSt($1,$4);}
-         | PRINT expr {$$ = createPrintSt($2);}
+statement: VAR_NAME EQUALS expr {printf("AS\n");$$ = createAsigSt($1,$3);}
+         | VAR_NAME TWO_POINTS EQUALS expr {printf("VD\n");$$ = createDeclAsigSt($1,$4);} 
+         | PRINT expr {printf("PR\n");$$ = createPrintSt($2);}
          ;
 expr: expr PLUS expr0  {$$ = createBinary(PLUS_OP,$1, $3);}
     | expr MINUS expr0 {$$ = createBinary(MINUS_BINARY_OP,$1, $3);}
@@ -56,7 +57,7 @@ expr2: OPEN_PAR expr CLOSE_PAR {$$ = $2;}
 
 int main() {
 	table = createTable();
-	yyparse();
+	printf("EXITED WITH %d",yyparse());
 	printTable(table);
 	return 0;
 }

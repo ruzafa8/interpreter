@@ -9,7 +9,7 @@ Variable * createTable(){
 
 bool exists(char * name, Variable* table){
 	bool exists = false;
-	while(table != NULL && !(exists = strcmp(table->name,name) == 0));
+	while(table != NULL && !(exists = strcmp(table->name,name) == 0)) table = table->next;
 	return exists;
 }
 
@@ -33,9 +33,20 @@ bool valueOf(char * name, int* value, const Variable* table){
 	return table != NULL;
 }
 
+bool modify(char *name, int value, Variable* table){
+	while(table != NULL && strcmp(table->name, name) != 0)
+		table = table->next;
+	if(table != NULL) 
+		table->value = value;
+
+	return table != NULL;
+}
+
 void printTable(const Variable *t){
+	printf("\n"); printf("--------------- TABLA DE VARIABLES ---------------\n");
 	while(t != NULL){
 		printf("%s = %d\n",t->name,t->value);
 		t = t->next;
 	}
+	printf("---------------------------------------------------");
 }

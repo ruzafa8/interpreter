@@ -2,7 +2,7 @@
 #include"expression_ast.h"
 
 typedef enum {
-	PRINT_ST, DECL_ASIG_ST, DOUBLE_ST
+	PRINT_ST, DECL_ASIG_ST, DOUBLE_ST, ASIG_ST
 } StatementType;
 
 typedef struct {
@@ -19,10 +19,16 @@ typedef struct {
 	struct StatementAST* second;
 } DoubleSt;
 
+typedef struct {
+	char * name;
+	ExpressionAST* value;
+} AsigSt;
+
 typedef union { 
 	PrintSt* print_st;
 	DeclAsigSt* decl_asig_st;
 	DoubleSt* double_st;
+	AsigSt * asig_st;
 } StatementUnion;
 
 typedef struct StatementAST{
@@ -33,5 +39,6 @@ typedef struct StatementAST{
 StatementAST * createPrintSt(ExpressionAST *);
 StatementAST * createDeclAsigSt(char*,ExpressionAST*);
 StatementAST * createDoubleSt(StatementAST *,StatementAST *);
+StatementAST * createAsigSt(char*,ExpressionAST*);
 
 void execute(StatementAST*,Variable**);

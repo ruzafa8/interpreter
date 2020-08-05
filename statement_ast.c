@@ -28,10 +28,21 @@ StatementAST* createDoubleSt(StatementAST* s1,StatementAST* s2){
 	return s;
 }
 
+StatementAST * createAsigSt(char* name,ExpressionAST* value){
+	StatementAST* s = (StatementAST*) malloc(sizeof(StatementAST));
+	s->type = ASIG_ST;
+	s->statement.asig_st = (AsigSt*) malloc(sizeof(AsigSt));
+	s->statement.asig_st->name = strdup(name);
+	s->statement.asig_st->value = (ExpressionAST*) malloc(sizeof(ExpressionAST));
+	*(s->statement.asig_st->value) = *value;
+	
+	return s;
+}
+
 // ---------------------------------------------------------------------------
 
-void executePrintSt(PrintSt* st, Variable** context){
-	printf("> %d", evaluate(st->e, *context));
+void executePrintSt(PrintSt* st, Variable* context){
+	printf("> %d", evaluate(st->e, context));
 }
 
 void executeDeclAsigSt(DeclAsigSt* st, Variable** context){
@@ -44,17 +55,25 @@ void executeDoubleSt(DoubleSt* st, Variable** context){
 	execute(st->second, context);
 }
 
+void executeAsigSt(AsigSt* st, Variable* context){
+	bool modified = modify(st->name, evaluate(st->value, context), context);
+	if(!modified) printf("La variable %s no se ha modificado porque no existía",st->name);
+}
+
 
 void execute(StatementAST* s, Variable** context){
 	switch(s->type){
 		case PRINT_ST:
-			executePrintSt(s->statement.print_st, context);
+			executePrintSt(s->statement.print_st, *context);
 			break;
 		case DECL_ASIG_ST:
 			executeDeclAsigSt(s->statement.decl_asig_st, context);
 			break;
 		case DOUBLE_ST:
 			executeDoubleSt(s->statement.double_st, context);
+			break;
+		case ASIG_ST:
+			executeAsigSt(s->statement.asig_st, *context);
 			break;
 	}
 }
