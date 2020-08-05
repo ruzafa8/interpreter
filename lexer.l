@@ -17,7 +17,7 @@ LITERALS {LITERAL}+
 "-"       return MINUS;
 "*"       return BY;
 "/"       return DIV;
-"\n"	  return ENTER;
+"fin"	  {return FIN;}
 ":"       return TWO_POINTS;
 "="       return EQUALS;
 "print"   return PRINT;

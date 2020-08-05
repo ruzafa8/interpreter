@@ -1,37 +1,38 @@
 %{
 	#include"variable.h"
-	#include <stdio.h>
 	void yyerror (char *);
     extern int yylex();
 	Variable *table;
 %}
 
 %code requires {
-	#include"expression_ast.h"
-	
+	#include"statement_ast.h"
 }
 %union {
 	int integer;
 	char * string;
-	ExpressionAST * ast;
+	ExpressionAST * exp;
+	StatementAST * st;
 }
-%token PLUS MINUS BY DIV OPEN_PAR CLOSE_PAR ENTER
+%token PLUS MINUS BY DIV OPEN_PAR CLOSE_PAR FIN
 %token <integer> NUMBER
 
 %token <string> VAR_NAME
 %token EQUALS TWO_POINTS PRINT
 
-%type <ast> expr expr0 expr1 expr2
+%type <exp> expr expr0 expr1 expr2
+
+%type <st> statement statements
 %start S
 %%
 
-S: statements ENTER{return 0;}
+S: statements FIN{execute($1,&table); return 0;}
  ;
-statements: statement statements | statement;
-statement: VAR_NAME TWO_POINTS EQUALS expr {	bool inserted = insertVariable($1,evaluate($4),&table);
-												if(!inserted) printf("La variable %s no se ha insertado porque ya existía",$1);
-										   }
-         | PRINT expr {printf("> %d\n",evaluate($2));}
+statements: statement {$$ = $1;}
+          | statement statements {$$ = createDoubleSt($1,$2);}
+          ;
+statement: VAR_NAME TWO_POINTS EQUALS expr {$$ = createDeclAsigSt($1,$4);}
+         | PRINT expr {$$ = createPrintSt($2);}
          ;
 expr: expr PLUS expr0  {$$ = createBinary(PLUS_OP,$1, $3);}
     | expr MINUS expr0 {$$ = createBinary(MINUS_BINARY_OP,$1, $3);}
@@ -49,18 +50,13 @@ expr1: MINUS expr1 {$$ = createUnary(MINUS_UNARY_OP, $2);}
 
 expr2: OPEN_PAR expr CLOSE_PAR {$$ = $2;}
      | NUMBER {$$ = createLeaf($1);}	
-     | VAR_NAME {
-					int value;
-					bool obtenido = valueOf($1,&value,table);
-					if(!obtenido) {printf("La variable no existía"); return -1;}
-					else $$ = createLeaf(value);
-}
+     | VAR_NAME {$$ = createVariable($1);}
      ;
 %%
 
 int main() {
 	table = createTable();
-	while(!yyparse());
+	yyparse();
 	printTable(table);
 	return 0;
 }
